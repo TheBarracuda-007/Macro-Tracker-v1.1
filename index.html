@@ -1,181 +1,300 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title> Macro Tracker </title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 40px;
-      background-color: #1e1e1e;
-      color: #e0e0e0;
-    }
-    h2 {
-      text-align: center;
-      color: #ffffff;
-      margin-bottom: 20px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 20px;
-      background-color: #2a2a2a;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-    }
-    th, td {
-      border: 1px solid #3a3a3a;
-      padding: 10px;
-      text-align: center;
-    }
-    th {
-      background-color: #333;
-      color: #f1f1f1;
-    }
-    tfoot td {
-      font-weight: bold;
-      background-color: #252525;
-      color: #76ff7a;
-      box-shadow: inset 0 0 10px rgba(118, 255, 122, 0.3);
-    }
-    input {
-      width: 80px;
-      text-align: center;
-      background-color: #1e1e1e;
-      border: 1px solid #555;
-      border-radius: 5px;
-      color: #fff;
-      padding: 5px;
-    }
-    input:focus {
-      outline: none;
-      border-color: #76ff7a;
-      box-shadow: 0 0 6px #76ff7a;
-    }
-    button {
-      padding: 10px 16px;
-      margin: 5px;
-      cursor: pointer;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      background-color: #333;
-      color: #e0e0e0;
-      transition: background 0.2s, transform 0.1s;
-    }
-    button:hover {
-      background-color: #444;
-      transform: scale(1.03);
-    }
-    #memory {
-      margin-top: 30px;
-      padding: 15px;
-      background-color: #2a2a2a;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-    }
-    #memory h3 {
-      margin-top: 0;
-      color: #76ff7a;
-    }
-    .memory-entry {
-      background-color: #1e1e1e;
-      padding: 8px;
-      margin: 6px 0;
-      border-radius: 6px;
-      border: 1px solid #444;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Macro Tracker</title>
+    <style>
+        :root {
+            --bg-color: #1e1e1e;
+            --text-color: #e0e0e0;
+            --accent-color: #76ff7a;
+            --table-bg: #2a2a2a;
+            --header-bg: #333;
+            --border-color: #3a3a3a;
+            --input-bg: #1e1e1e;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        /* --- General Elements --- */
+        h2 {
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 20px;
+        }
+
+        /* --- Table Styling (Standard/Desktop) --- */
+        table {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 20px auto;
+            border-collapse: collapse;
+            background-color: var(--table-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: var(--header-bg);
+            color: #f1f1f1;
+        }
+
+        /* --- Totals (Footer) --- */
+        tfoot td {
+            font-weight: bold;
+            background-color: #252525;
+            color: var(--accent-color);
+            box-shadow: inset 0 0 10px rgba(118, 255, 122, 0.3);
+        }
+
+        /* --- Input Fields --- */
+        input {
+            width: 100%;
+            max-width: 80px;
+            box-sizing: border-box;
+            text-align: center;
+            background-color: var(--input-bg);
+            border: 1px solid #555;
+            border-radius: 5px;
+            color: #fff;
+            padding: 5px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 6px var(--accent-color);
+        }
+
+        /* --- Buttons --- */
+        button {
+            padding: 10px 16px;
+            margin: 5px;
+            cursor: pointer;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            background-color: var(--header-bg);
+            color: var(--text-color);
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: #444;
+            transform: scale(1.03);
+        }
+
+        /* --- Memory Section --- */
+        #memory {
+            max-width: 800px;
+            margin: 30px auto 0 auto;
+            padding: 15px;
+            background-color: var(--table-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        #memory h3 {
+            margin-top: 0;
+            color: var(--accent-color);
+            text-align: center;
+        }
+
+        .memory-entry {
+            background-color: var(--input-bg);
+            padding: 10px;
+            margin: 6px 0;
+            border-radius: 6px;
+            border: 1px solid #444;
+            white-space: pre-wrap;
+        }
+
+        /* ======================================= */
+        /* ======== MOBILE RESPONSIVENESS ======== */
+        /* ======================================= */
+
+        @media only screen and (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            /* Make buttons fill the width of the screen on mobile for easy tapping */
+            div[style="text-align:center;"] button {
+                display: block;
+                width: 90%;
+                margin: 10px auto;
+            }
+
+            /* --- Table Restructure for Mobile (Stacking Cells) --- */
+            #macroTable, thead, tbody, th, td, tr {
+                display: block;
+            }
+            
+            thead {
+                display: none; /* Hide the header row */
+            }
+
+            tr {
+                border: 1px solid var(--border-color);
+                margin-bottom: 10px;
+                border-radius: 10px;
+            }
+
+            td {
+                border: none;
+                border-bottom: 1px solid var(--border-color);
+                position: relative;
+                padding-left: 50%;
+                text-align: right;
+            }
+
+            /* Display the header label using the data-label attribute */
+            td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 10px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                text-align: left;
+                font-weight: bold;
+                color: var(--accent-color);
+            }
+            
+            /* Adjust inputs to fill the available space */
+            td input {
+                width: 100%;
+                max-width: none;
+            }
+            
+            /* The Totals (TFOOT) section styling for mobile */
+            tfoot {
+                border: none;
+            }
+
+            tfoot td {
+                box-shadow: none; 
+                border: 1px solid var(--border-color);
+                background-color: var(--table-bg);
+                padding: 15px 10px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h2>🌙 Daily Macro Tracker</h2>
-  <table id="macroTable">
-    <thead>
-      <tr>
-        <th>Calories</th>
-        <th>Fat (g)</th>
-        <th>Carbs (g)</th>
-        <th>Protein (g)</th>
-      </tr>
-    </thead>
-    <tbody id="tableBody">
-      <tr>
-        <td><input type="number" class="cal"></td>
-        <td><input type="number" class="fat"></td>
-        <td><input type="number" class="carb"></td>
-        <td><input type="number" class="prot"></td>
-      </tr>
-    </tbody>
-    <tfoot>
-      <tr>
-        <td id="totalCal">0</td>
-        <td id="totalFat">0</td>
-        <td id="totalCarb">0</td>
-        <td id="totalProt">0</td>
-      </tr>
-    </tfoot>
-  </table>
-  <div style="text-align:center;">
-    <button onclick="addRow()">➕ Add Meal</button>
-    <button onclick="saveTotals()">💾 Save Totals</button>
-  </div>
+    <h2>🌙 Daily Macro Tracker</h2>
+    <table id="macroTable">
+        <thead>
+            <tr>
+                <th>Calories</th>
+                <th>Fat (g)</th>
+                <th>Carbs (g)</th>
+                <th>Protein (g)</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <tr>
+                <td data-label="Calories"><input type="number" class="cal"></td>
+                <td data-label="Fat (g)"><input type="number" class="fat"></td>
+                <td data-label="Carbs (g)"><input type="number" class="carb"></td>
+                <td data-label="Protein (g)"><input type="number" class="prot"></td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td id="totalCal" data-label="Total Calories">0</td>
+                <td id="totalFat" data-label="Total Fat">0</td>
+                <td id="totalCarb" data-label="Total Carbs">0</td>
+                <td id="totalProt" data-label="Total Protein">0</td>
+            </tr>
+        </tfoot>
+    </table>
+    <div style="text-align:center;">
+        <button onclick="addRow()">➕ Add Meal</button>
+        <button onclick="saveTotals()">💾 Save Totals</button>
+    </div>
 
-  <div id="memory">
-    <h3>📒 Saved Totals</h3>
-    <div id="memoryList"></div>
-  </div>
+    <div id="memory">
+        <h3>📒 Saved Totals</h3>
+        <div id="memoryList"></div>
+    </div>
 
-  <script>
-    function addRow() {
-      const tableBody = document.getElementById("tableBody");
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td><input type="number" class="cal"></td>
-        <td><input type="number" class="fat"></td>
-        <td><input type="number" class="carb"></td>
-        <td><input type="number" class="prot"></td>
-      `;
-      tableBody.appendChild(row);
-      attachListeners(row.querySelectorAll("input"));
-    }
+    <script>
+        function addRow() {
+            const tableBody = document.getElementById("tableBody");
+            const row = document.createElement("tr");
+            // NOTE: data-label attributes are added here for new rows
+            row.innerHTML = `
+                <td data-label="Calories"><input type="number" class="cal"></td>
+                <td data-label="Fat (g)"><input type="number" class="fat"></td>
+                <td data-label="Carbs (g)"><input type="number" class="carb"></td>
+                <td data-label="Protein (g)"><input type="number" class="prot"></td>
+            `;
+            tableBody.appendChild(row);
+            attachListeners(row.querySelectorAll("input"));
+        }
 
-    function calculateTotals() {
-      let totalCal = 0, totalFat = 0, totalCarb = 0, totalProt = 0;
+        function calculateTotals() {
+            let totalCal = 0, totalFat = 0, totalCarb = 0, totalProt = 0;
 
-      document.querySelectorAll(".cal").forEach(i => totalCal += Number(i.value) || 0);
-      document.querySelectorAll(".fat").forEach(i => totalFat += Number(i.value) || 0);
-      document.querySelectorAll(".carb").forEach(i => totalCarb += Number(i.value) || 0);
-      document.querySelectorAll(".prot").forEach(i => totalProt += Number(i.value) || 0);
+            document.querySelectorAll(".cal").forEach(i => totalCal += Number(i.value) || 0);
+            document.querySelectorAll(".fat").forEach(i => totalFat += Number(i.value) || 0);
+            document.querySelectorAll(".carb").forEach(i => totalCarb += Number(i.value) || 0);
+            document.querySelectorAll(".prot").forEach(i => totalProt += Number(i.value) || 0);
 
-      document.getElementById("totalCal").innerText = totalCal;
-      document.getElementById("totalFat").innerText = totalFat;
-      document.getElementById("totalCarb").innerText = totalCarb;
-      document.getElementById("totalProt").innerText = totalProt;
-    }
+            document.getElementById("totalCal").innerText = totalCal;
+            document.getElementById("totalFat").innerText = totalFat;
+            document.getElementById("totalCarb").innerText = totalCarb;
+            document.getElementById("totalProt").innerText = totalProt;
+        }
 
-    function attachListeners(inputs) {
-      inputs.forEach(input => {
-        input.addEventListener("input", calculateTotals);
-      });
-    }
+        function attachListeners(inputs) {
+            inputs.forEach(input => {
+                input.addEventListener("input", calculateTotals);
+            });
+        }
 
-    function saveTotals() {
-      const totalCal = document.getElementById("totalCal").innerText;
-      const totalFat = document.getElementById("totalFat").innerText;
-      const totalCarb = document.getElementById("totalCarb").innerText;
-      const totalProt = document.getElementById("totalProt").innerText;
+        function saveTotals() {
+            const totalCal = document.getElementById("totalCal").innerText;
+            const totalFat = document.getElementById("totalFat").innerText;
+            const totalCarb = document.getElementById("totalCarb").innerText;
+            const totalProt = document.getElementById("totalProt").innerText;
+            
+            if (Number(totalCal) === 0 && Number(totalFat) === 0 && Number(totalCarb) === 0 && Number(totalProt) === 0) {
+                alert("The current totals are zero. Nothing to save!");
+                return;
+            }
 
-      const entry = document.createElement("div");
-      entry.classList.add("memory-entry");
-      entry.innerText = `Calories: ${totalCal}, Fat: ${totalFat}g, Carbs: ${totalCarb}g, Protein: ${totalProt}g`;
+            const now = new Date();
+            const dateStr = now.toLocaleDateString();
+            const timeStr = now.toLocaleTimeString();
 
-      document.getElementById("memoryList").appendChild(entry);
-    }
+            const entry = document.createElement("div");
+            entry.classList.add("memory-entry");
+            entry.innerHTML = `
+                <strong>${dateStr} @ ${timeStr}</strong><br>
+                Calories: ${totalCal}, Fat: ${totalFat}g, Carbs: ${totalCarb}g, Protein: ${totalProt}g
+            `;
 
-    // Attach listeners to first row
-    attachListeners(document.querySelectorAll("input"));
-  </script>
+            document.getElementById("memoryList").prepend(entry); // Add newest entry to the top
+        }
+
+        // Attach listeners to first row on page load
+        attachListeners(document.querySelectorAll("input"));
+    </script>
 </body>
 </html>
 Initial commit
