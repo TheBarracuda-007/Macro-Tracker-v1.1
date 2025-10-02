@@ -7,22 +7,23 @@
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
+        /* --- NEW DARK AMBER THEME --- */
         :root {
-            --bg-color: #1e1e1e;
-            --text-color: #e0e0e0;
-            --accent-color: #76ff7a; /* Green for positive/remaining */
-            --over-goal-color: #ff4d4d; /* Red for over goal */
-            --table-bg: #2a2a2a;
-            --header-bg: #333;
-            --border-color: #3a3a3a;
-            --input-bg: #1e1e1e;
+            --bg-color: #121212;         /* Deep Black Background */
+            --text-color: #f0f0f0;       /* Light Text */
+            --accent-color: #ffc107;     /* Amber/Gold for highlights */
+            --over-goal-color: #ff4d4d;  /* Red for danger */
+            --table-bg: #1e1e1e;         /* Slightly lighter background for sections */
+            --header-bg: #282828;        /* Darker grey for headers/footers */
+            --border-color: #333;
+            --input-bg: #121212;
 
-            /* Chart Colors */
-            --chart-consumed: #76ff7a;     /* Green */
-            --chart-remaining: #555;        /* Gray */
-            --chart-fat: #ffeb3b;          /* Yellow */
-            --chart-carbs: #2196f3;        /* Blue */
-            --chart-protein: #f44336;      /* Red */
+            /* Chart Colors - High Contrast */
+            --chart-consumed: #ffc107;   /* Amber */
+            --chart-remaining: #333;     /* Dark Grey */
+            --chart-fat: #ff9800;        /* Orange */
+            --chart-carbs: #2196f3;      /* Blue */
+            --chart-protein: #e91e63;    /* Pink/Magenta */
         }
 
         body {
@@ -36,14 +37,14 @@
         /* Wrapper for general padding */
         #app-container {
             padding: 20px;
-            max-width: 900px; /* Increased max width for charts */
+            max-width: 900px;
             margin: 0 auto;
         }
 
         /* --- General Elements --- */
         h2 {
             text-align: center;
-            color: #ffffff;
+            color: var(--accent-color);
             margin-bottom: 20px;
         }
         
@@ -68,9 +69,9 @@
             max-width: 100px;
             text-align: right;
             background-color: var(--input-bg);
-            border: 1px solid #555;
+            border: 1px solid var(--border-color);
             border-radius: 5px;
-            color: #fff;
+            color: var(--text-color);
             padding: 5px;
         }
 
@@ -88,7 +89,7 @@
         #chart-dashboard {
             display: flex;
             justify-content: space-around;
-            flex-wrap: wrap; /* Allows wrapping on small screens */
+            flex-wrap: wrap;
             margin-bottom: 30px;
             gap: 20px;
         }
@@ -98,8 +99,8 @@
             padding: 15px;
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            width: 45%; /* Default for desktop/wide view */
-            min-width: 250px; /* Minimum size for charts */
+            width: 45%;
+            min-width: 250px;
             max-width: 400px;
             display: flex;
             justify-content: center;
@@ -109,6 +110,9 @@
         .chart-box canvas {
             max-height: 250px;
             max-width: 100%;
+            /* Explicitly set canvas background for safety in dark themes */
+            background-color: var(--table-bg); 
+            border-radius: 8px;
         }
 
         /* --- Table Styling --- */
@@ -130,7 +134,7 @@
 
         th {
             background-color: var(--header-bg);
-            color: #f1f1f1;
+            color: var(--text-color);
         }
 
         /* --- Input Fields (in Table) --- */
@@ -140,9 +144,9 @@
             box-sizing: border-box;
             text-align: center;
             background-color: var(--input-bg);
-            border: 1px solid #555;
+            border: 1px solid var(--border-color);
             border-radius: 5px;
-            color: #fff;
+            color: var(--text-color);
             padding: 5px;
         }
 
@@ -166,7 +170,7 @@
         }
 
         button:hover {
-            background-color: #444;
+            background-color: var(--border-color);
             transform: scale(1.03);
         }
 
@@ -190,16 +194,16 @@
             padding: 10px;
             margin: 6px 0;
             border-radius: 6px;
-            border: 1px solid #444;
+            border: 1px solid var(--border-color);
             white-space: pre-wrap;
         }
 
         /* --- Totals (Desktop View) --- */
         #macroTable tfoot td {
             font-weight: bold;
-            background-color: #252525;
+            background-color: var(--header-bg);
             color: var(--accent-color);
-            box-shadow: inset 0 0 10px rgba(118, 255, 122, 0.3);
+            box-shadow: inset 0 0 10px rgba(255, 193, 7, 0.3); /* Amber glow */
         }
 
         /* --- Mobile Totals Section (Hidden on Desktop) --- */
@@ -241,18 +245,18 @@
                 padding: 10px;
             }
 
-            /* Chart adjustment for mobile */
+            /* Charts full width on mobile */
             #chart-dashboard {
                 flex-direction: column;
                 gap: 15px;
             }
 
             .chart-box {
-                width: 100%; /* Full width on mobile */
+                width: 100%; 
                 max-width: none;
             }
             
-            /* Goal Tracker adjustment for mobile */
+            /* Goal Tracker stack on mobile */
             #goal-tracker {
                 flex-direction: column;
                 align-items: stretch;
@@ -265,14 +269,14 @@
                 margin: 5px 0;
             }
             
-            /* Make buttons fill the width of the screen on mobile for easy tapping */
+            /* Buttons full width on mobile */
             div[style="text-align:center;"] button {
                 display: block;
                 width: 90%;
                 margin: 10px auto;
             }
 
-            /* --- Table Restructure for Mobile (Stacking Cells) --- */
+            /* --- Table Mobile Restructure (Stacking Cells) --- */
             #macroTable {
                 margin-bottom: 0;
             }
@@ -280,12 +284,8 @@
                 display: block;
             }
             
-            thead {
-                display: none;
-            }
-            
-            tfoot {
-                display: none;
+            thead, tfoot {
+                display: none; /* Hide standard header and footer on mobile */
             }
 
             tr {
@@ -440,7 +440,6 @@
                                 if (label) {
                                     label += ': ';
                                 }
-                                // Display value and ensure it's a number (or "over")
                                 label += context.raw;
                                 return label;
                             }
@@ -537,8 +536,8 @@
 
             // Calculate Remaining Calories
             const calGoal = Number(document.getElementById("calGoal").value) || 0;
-            let remainingCalDisplay = calGoal - totalCal; // For display text
-            let remainingCalChart = Math.max(0, calGoal - totalCal); // For chart (don't show negative slice)
+            let remainingCalDisplay = calGoal - totalCal; 
+            let remainingCalChart = Math.max(0, calGoal - totalCal); 
 
             const remainingElement = document.getElementById("remainingCal");
             
@@ -574,8 +573,8 @@
             caloriesChart.data.datasets[0].backgroundColor[0] = (totalCal > calGoal && calGoal > 0) ? 
                 'var(--over-goal-color)' : 'var(--chart-consumed)';
             
-            // Only show a consumed slice if we've actually consumed something
-            if (totalCal === 0 && remainingCalChart > 0) {
+            // Handle initial state where nothing is entered
+            if (totalCal === 0 && calGoal > 0) {
                 caloriesChart.data.datasets[0].data = [0, calGoal];
                 caloriesChart.data.datasets[0].backgroundColor[0] = 'var(--chart-remaining)';
             }
