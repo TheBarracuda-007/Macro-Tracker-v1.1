@@ -9,7 +9,7 @@
         :root {
             --bg-color: #1e1e1e;
             --text-color: #e0e0e0;
-            --accent-color: #76ff7a;
+            --accent-color: #76ff7a; /* Green for positive/remaining */
             --over-goal-color: #ff4d4d; /* Red for over goal */
             --table-bg: #2a2a2a;
             --header-bg: #333;
@@ -100,6 +100,15 @@
             width: 45%; /* Default for desktop/wide view */
             min-width: 250px; /* Minimum size for charts */
             max-width: 400px;
+            display: flex; /* Use flexbox to center canvas */
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Set explicit height for canvas within chart-box to ensure it renders */
+        .chart-box canvas {
+            max-height: 250px; /* Adjust as needed */
+            max-width: 100%;
         }
 
         /* --- Table Styling --- */
@@ -428,6 +437,17 @@
                                 return label;
                             }
                         }
+                    },
+                     title: { // Add title options directly here
+                        display: true,
+                        color: 'var(--text-color)',
+                        font: {
+                            size: 16
+                        },
+                        padding: {
+                            top: 10,
+                            bottom: 10
+                        }
                     }
                 }
             };
@@ -445,7 +465,16 @@
                         borderWidth: 2
                     }]
                 },
-                options: {...chartOptions, title: {display: true, text: 'Calorie Progress'}}
+                options: {
+                    ...chartOptions, 
+                    plugins: {
+                        ...chartOptions.plugins, 
+                        title: {
+                            ...chartOptions.plugins.title,
+                            text: 'Calorie Progress'
+                        }
+                    }
+                }
             });
 
             // 2. Macro Composition Chart
@@ -455,13 +484,22 @@
                 data: {
                     labels: ['Fat (g)', 'Carbs (g)', 'Protein (g)'],
                     datasets: [{
-                        data: [1, 1, 1], // Initial values (avoids empty chart)
+                        data: [0, 0, 0], // Initial values as 0
                         backgroundColor: ['var(--chart-fat)', 'var(--chart-carbs)', 'var(--chart-protein)'],
                         borderColor: 'var(--table-bg)',
                         borderWidth: 2
                     }]
                 },
-                options: {...chartOptions, title: {display: true, text: 'Macro Breakdown'}}
+                options: {
+                    ...chartOptions, 
+                    plugins: {
+                        ...chartOptions.plugins, 
+                        title: {
+                            ...chartOptions.plugins.title,
+                            text: 'Macro Breakdown'
+                        }
+                    }
+                }
             });
         }
 
@@ -491,19 +529,20 @@
 
             // Calculate Remaining Calories
             const calGoal = Number(document.getElementById("calGoal").value) || 0;
-            let remainingCal = calGoal - totalCal;
+            let remainingCalDisplay = calGoal - totalCal; // For display text
+            let remainingCalChart = Math.max(0, calGoal - totalCal); // For chart (don't show negative slice)
+
             const remainingElement = document.getElementById("remainingCal");
             
             // --- Update UI Totals ---
             
             // Update Remaining Calorie Display and Color
             remainingElement.classList.remove('over-goal');
-            if (remainingCal < 0) {
-                remainingElement.innerText = Math.abs(remainingCal) + " over";
+            if (remainingCalDisplay < 0) {
+                remainingElement.innerText = Math.abs(remainingCalDisplay) + " over";
                 remainingElement.classList.add('over-goal');
-                remainingCal = 0; // Use 0 for the chart's "remaining" slice
             } else {
-                remainingElement.innerText = remainingCal;
+                remainingElement.innerText = remainingCalDisplay;
             }
 
             // Update Desktop Totals
@@ -521,7 +560,7 @@
             // --- Update Charts ---
 
             // 1. Calorie Chart Update
-            caloriesChart.data.datasets[0].data = [totalCal, remainingCal];
+            caloriesChart.data.datasets[0].data = [totalCal, remainingCalChart];
             
             // Change consumed color if goal is exceeded
             caloriesChart.data.datasets[0].backgroundColor[0] = (totalCal > calGoal && calGoal > 0) ? 
@@ -535,10 +574,12 @@
             
             if (totalMacros === 0) {
                  // Prevent Chart.js from displaying a messy chart when all inputs are 0
-                macrosChart.data.datasets[0].data = [1, 1, 1];
-                macrosChart.data.datasets[0].backgroundColor = ['var(--chart-remaining)', 'var(--chart-remaining)', 'var(--chart-remaining)'];
-                macrosChart.data.labels = ['Fat (g)', 'Carbs (g)', 'Protein (g)'];
+                 // Instead, show a single grey slice if all are zero.
+                macrosChart.data.labels = ['No Data'];
+                macrosChart.data.datasets[0].data = [1]; // A single slice representing no data
+                macrosChart.data.datasets[0].backgroundColor = ['var(--chart-remaining)'];
             } else {
+                macrosChart.data.labels = ['Fat (g)', 'Carbs (g)', 'Protein (g)'];
                 macrosChart.data.datasets[0].data = macroData;
                 macrosChart.data.datasets[0].backgroundColor = ['var(--chart-fat)', 'var(--chart-carbs)', 'var(--chart-protein)'];
             }
@@ -566,7 +607,7 @@
 
             const now = new Date();
             const dateStr = now.toLocaleDateString();
-            const timeStr = now.toLocaleTimeString();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }); // Nicer time format
 
             const entry = document.createElement("div");
             entry.classList.add("memory-entry");
