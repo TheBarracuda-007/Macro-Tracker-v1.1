@@ -9,6 +9,7 @@
             --bg-color: #1e1e1e;
             --text-color: #e0e0e0;
             --accent-color: #76ff7a;
+            --warning-color: #ff9900;
             --table-bg: #2a2a2a;
             --header-bg: #333;
             --border-color: #3a3a3a;
@@ -36,7 +37,44 @@
             color: #ffffff;
             margin-bottom: 20px;
         }
+        
+        /* --- Calorie Goal Section --- */
+        #goal-tracker {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            background-color: #333;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
 
+        #goal-tracker label, #goal-tracker span {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        #goal-tracker label {
+            color: var(--text-color);
+            white-space: nowrap;
+        }
+
+        #goal-tracker #calGoal {
+            max-width: 100px;
+            text-align: right;
+        }
+
+        #remainingCal {
+            color: var(--accent-color);
+            min-width: 80px; /* Ensure space for the number */
+            text-align: right;
+        }
+
+        .over-goal {
+            color: #ff4d4d !important; /* Red color for going over */
+        }
+        
         /* --- Table Styling (Standard/Desktop) --- */
         table {
             width: 100%;
@@ -167,6 +205,19 @@
                 padding: 10px;
             }
             
+            /* Goal Tracker adjustment for mobile */
+            #goal-tracker {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 15px;
+            }
+            #goal-tracker > div {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin: 5px 0;
+            }
+            
             /* Make buttons fill the width of the screen on mobile for easy tapping */
             div[style="text-align:center;"] button {
                 display: block;
@@ -176,18 +227,18 @@
 
             /* --- Table Restructure for Mobile (Stacking Cells) --- */
             #macroTable {
-                margin-bottom: 0; /* Remove space before mobile totals */
+                margin-bottom: 0;
             }
             #macroTable, thead, tbody, th, td, tr {
                 display: block;
             }
             
             thead {
-                display: none; /* Hide the header row */
+                display: none;
             }
             
             tfoot {
-                display: none; /* Hide the totals row on mobile */
+                display: none;
             }
 
             tr {
@@ -237,6 +288,17 @@
 <body>
     <div id="app-container">
         <h2>🌙 Daily Macro Tracker</h2>
+        
+        <div id="goal-tracker">
+            <div>
+                <label for="calGoal">Calorie Goal:</label>
+                <input type="number" id="calGoal" placeholder="2000" value="2000" oninput="calculateTotals()">
+            </div>
+            <div>
+                <span>Remaining:</span>
+                <span id="remainingCal">2000</span>
+            </div>
+        </div>
         <table id="macroTable">
             <thead>
                 <tr>
@@ -310,11 +372,27 @@
 
         function calculateTotals() {
             let totalCal = 0, totalFat = 0, totalCarb = 0, totalProt = 0;
-
+            
+            // Calculate Current Totals
             document.querySelectorAll(".cal").forEach(i => totalCal += Number(i.value) || 0);
             document.querySelectorAll(".fat").forEach(i => totalFat += Number(i.value) || 0);
             document.querySelectorAll(".carb").forEach(i => totalCarb += Number(i.value) || 0);
             document.querySelectorAll(".prot").forEach(i => totalProt += Number(i.value) || 0);
+
+            // Calculate Remaining Calories
+            const calGoal = Number(document.getElementById("calGoal").value) || 0;
+            const remainingCal = calGoal - totalCal;
+            const remainingElement = document.getElementById("remainingCal");
+
+            // Update Remaining Calorie Display and Color
+            remainingElement.innerText = remainingCal;
+            remainingElement.classList.remove('over-goal');
+            if (remainingCal < 0) {
+                remainingElement.innerText = Math.abs(remainingCal) + " over";
+                remainingElement.classList.add('over-goal');
+            } else {
+                remainingElement.innerText = remainingCal;
+            }
 
             // Update Desktop Totals
             document.getElementById("totalCal").innerText = totalCal;
@@ -333,7 +411,7 @@
             inputs.forEach(input => {
                 input.addEventListener("input", calculateTotals);
             });
-            calculateTotals(); // Call once to initialize mobile totals display
+            calculateTotals(); // Call once to initialize all displays
         }
 
         function saveTotals() {
@@ -361,9 +439,8 @@
             document.getElementById("memoryList").prepend(entry);
         }
 
-        // Attach listeners to first row on page load
+        // Attach listeners to all existing input fields (the first row) and initialize the totals
         attachListeners(document.querySelectorAll("input"));
     </script>
 </body>
 </html>
-Initial commit
