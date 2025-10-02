@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Macro Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Macro Tracker</title>
     <style>
         :root {
             --bg-color: #1e1e1e;
@@ -17,9 +18,16 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             background-color: var(--bg-color);
             color: var(--text-color);
+        }
+
+        /* Wrapper for general padding */
+        #app-container {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
         /* --- General Elements --- */
@@ -32,7 +40,6 @@
         /* --- Table Styling (Standard/Desktop) --- */
         table {
             width: 100%;
-            max-width: 800px;
             margin: 0 auto 20px auto;
             border-collapse: collapse;
             background-color: var(--table-bg);
@@ -50,14 +57,6 @@
         th {
             background-color: var(--header-bg);
             color: #f1f1f1;
-        }
-
-        /* --- Totals (Footer) --- */
-        tfoot td {
-            font-weight: bold;
-            background-color: #252525;
-            color: var(--accent-color);
-            box-shadow: inset 0 0 10px rgba(118, 255, 122, 0.3);
         }
 
         /* --- Input Fields --- */
@@ -99,8 +98,7 @@
 
         /* --- Memory Section --- */
         #memory {
-            max-width: 800px;
-            margin: 30px auto 0 auto;
+            margin-top: 30px;
             padding: 15px;
             background-color: var(--table-bg);
             border-radius: 10px;
@@ -122,12 +120,50 @@
             white-space: pre-wrap;
         }
 
+        /* --- Totals (Desktop View) --- */
+        #macroTable tfoot td {
+            font-weight: bold;
+            background-color: #252525;
+            color: var(--accent-color);
+            box-shadow: inset 0 0 10px rgba(118, 255, 122, 0.3);
+        }
+
+        /* --- Mobile Totals Section (Hidden on Desktop) --- */
+        #mobileTotals {
+            display: none;
+            margin-top: 20px;
+            background-color: var(--table-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .total-row:last-child {
+            border-bottom: none;
+        }
+
+        .total-label {
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        .total-value {
+            font-weight: bold;
+        }
+
+
         /* ======================================= */
         /* ======== MOBILE RESPONSIVENESS ======== */
         /* ======================================= */
 
         @media only screen and (max-width: 600px) {
-            body {
+            #app-container {
                 padding: 10px;
             }
             
@@ -139,12 +175,19 @@
             }
 
             /* --- Table Restructure for Mobile (Stacking Cells) --- */
+            #macroTable {
+                margin-bottom: 0; /* Remove space before mobile totals */
+            }
             #macroTable, thead, tbody, th, td, tr {
                 display: block;
             }
             
             thead {
                 display: none; /* Hide the header row */
+            }
+            
+            tfoot {
+                display: none; /* Hide the totals row on mobile */
             }
 
             tr {
@@ -179,64 +222,82 @@
                 width: 100%;
                 max-width: none;
             }
-            
-            /* The Totals (TFOOT) section styling for mobile */
-            tfoot {
-                border: none;
-            }
 
-            tfoot td {
-                box-shadow: none; 
-                border: 1px solid var(--border-color);
-                background-color: var(--table-bg);
-                padding: 15px 10px;
+            /* Show Mobile Totals Section */
+            #mobileTotals {
+                display: block;
+            }
+            
+            #memory {
+                margin-top: 20px;
             }
         }
     </style>
 </head>
 <body>
-    <h2>🌙 Daily Macro Tracker</h2>
-    <table id="macroTable">
-        <thead>
-            <tr>
-                <th>Calories</th>
-                <th>Fat (g)</th>
-                <th>Carbs (g)</th>
-                <th>Protein (g)</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody">
-            <tr>
-                <td data-label="Calories"><input type="number" class="cal"></td>
-                <td data-label="Fat (g)"><input type="number" class="fat"></td>
-                <td data-label="Carbs (g)"><input type="number" class="carb"></td>
-                <td data-label="Protein (g)"><input type="number" class="prot"></td>
-            </tr>
-        </tbody>
-        <tfoot>
-            <tr>
-                <td id="totalCal" data-label="Total Calories">0</td>
-                <td id="totalFat" data-label="Total Fat">0</td>
-                <td id="totalCarb" data-label="Total Carbs">0</td>
-                <td id="totalProt" data-label="Total Protein">0</td>
-            </tr>
-        </tfoot>
-    </table>
-    <div style="text-align:center;">
-        <button onclick="addRow()">➕ Add Meal</button>
-        <button onclick="saveTotals()">💾 Save Totals</button>
-    </div>
+    <div id="app-container">
+        <h2>🌙 Daily Macro Tracker</h2>
+        <table id="macroTable">
+            <thead>
+                <tr>
+                    <th>Calories</th>
+                    <th>Fat (g)</th>
+                    <th>Carbs (g)</th>
+                    <th>Protein (g)</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr>
+                    <td data-label="Calories"><input type="number" class="cal"></td>
+                    <td data-label="Fat (g)"><input type="number" class="fat"></td>
+                    <td data-label="Carbs (g)"><input type="number" class="carb"></td>
+                    <td data-label="Protein (g)"><input type="number" class="prot"></td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td id="totalCal">0</td>
+                    <td id="totalFat">0</td>
+                    <td id="totalCarb">0</td>
+                    <td id="totalProt">0</td>
+                </tr>
+            </tfoot>
+        </table>
 
-    <div id="memory">
-        <h3>📒 Saved Totals</h3>
-        <div id="memoryList"></div>
+        <div id="mobileTotals">
+            <div class="total-row">
+                <span class="total-label">Total Calories</span>
+                <span class="total-value" id="mobileTotalCal">0</span>
+            </div>
+            <div class="total-row">
+                <span class="total-label">Total Fat</span>
+                <span class="total-value" id="mobileTotalFat">0 g</span>
+            </div>
+            <div class="total-row">
+                <span class="total-label">Total Carbs</span>
+                <span class="total-value" id="mobileTotalCarb">0 g</span>
+            </div>
+            <div class="total-row">
+                <span class="total-label">Total Protein</span>
+                <span class="total-value" id="mobileTotalProt">0 g</span>
+            </div>
+        </div>
+
+        <div style="text-align:center;">
+            <button onclick="addRow()">➕ Add Meal</button>
+            <button onclick="saveTotals()">💾 Save Totals</button>
+        </div>
+
+        <div id="memory">
+            <h3>📒 Saved Totals</h3>
+            <div id="memoryList"></div>
+        </div>
     </div>
 
     <script>
         function addRow() {
             const tableBody = document.getElementById("tableBody");
             const row = document.createElement("tr");
-            // NOTE: data-label attributes are added here for new rows
             row.innerHTML = `
                 <td data-label="Calories"><input type="number" class="cal"></td>
                 <td data-label="Fat (g)"><input type="number" class="fat"></td>
@@ -255,16 +316,24 @@
             document.querySelectorAll(".carb").forEach(i => totalCarb += Number(i.value) || 0);
             document.querySelectorAll(".prot").forEach(i => totalProt += Number(i.value) || 0);
 
+            // Update Desktop Totals
             document.getElementById("totalCal").innerText = totalCal;
             document.getElementById("totalFat").innerText = totalFat;
             document.getElementById("totalCarb").innerText = totalCarb;
             document.getElementById("totalProt").innerText = totalProt;
+
+            // Update Mobile Totals
+            document.getElementById("mobileTotalCal").innerText = totalCal;
+            document.getElementById("mobileTotalFat").innerText = totalFat + " g";
+            document.getElementById("mobileTotalCarb").innerText = totalCarb + " g";
+            document.getElementById("mobileTotalProt").innerText = totalProt + " g";
         }
 
         function attachListeners(inputs) {
             inputs.forEach(input => {
                 input.addEventListener("input", calculateTotals);
             });
+            calculateTotals(); // Call once to initialize mobile totals display
         }
 
         function saveTotals() {
@@ -289,7 +358,7 @@
                 Calories: ${totalCal}, Fat: ${totalFat}g, Carbs: ${totalCarb}g, Protein: ${totalProt}g
             `;
 
-            document.getElementById("memoryList").prepend(entry); // Add newest entry to the top
+            document.getElementById("memoryList").prepend(entry);
         }
 
         // Attach listeners to first row on page load
