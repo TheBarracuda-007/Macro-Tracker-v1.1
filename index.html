@@ -4,16 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Macro Tracker</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
         :root {
             --bg-color: #1e1e1e;
             --text-color: #e0e0e0;
             --accent-color: #76ff7a;
-            --warning-color: #ff9900;
+            --over-goal-color: #ff4d4d; /* Red for over goal */
             --table-bg: #2a2a2a;
             --header-bg: #333;
             --border-color: #3a3a3a;
             --input-bg: #1e1e1e;
+
+            /* Chart Colors */
+            --chart-consumed: #76ff7a;     /* Green */
+            --chart-remaining: #555;        /* Gray */
+            --chart-fat: #ffeb3b;          /* Yellow */
+            --chart-carbs: #2196f3;        /* Blue */
+            --chart-protein: #f44336;      /* Red */
         }
 
         body {
@@ -27,7 +35,7 @@
         /* Wrapper for general padding */
         #app-container {
             padding: 20px;
-            max-width: 800px;
+            max-width: 900px; /* Increased max width for charts */
             margin: 0 auto;
         }
 
@@ -45,7 +53,7 @@
             align-items: center;
             padding: 15px 20px;
             margin-bottom: 25px;
-            background-color: #333;
+            background-color: var(--header-bg);
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
@@ -54,28 +62,47 @@
             font-weight: bold;
             font-size: 1.1em;
         }
-        
-        #goal-tracker label {
-            color: var(--text-color);
-            white-space: nowrap;
-        }
 
         #goal-tracker #calGoal {
             max-width: 100px;
             text-align: right;
+            background-color: var(--input-bg);
+            border: 1px solid #555;
+            border-radius: 5px;
+            color: #fff;
+            padding: 5px;
         }
 
         #remainingCal {
             color: var(--accent-color);
-            min-width: 80px; /* Ensure space for the number */
+            min-width: 80px;
             text-align: right;
         }
 
         .over-goal {
-            color: #ff4d4d !important; /* Red color for going over */
+            color: var(--over-goal-color) !important;
+        }
+
+        /* --- Chart Container Styling --- */
+        #chart-dashboard {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap; /* Allows wrapping on small screens */
+            margin-bottom: 30px;
+            gap: 20px;
         }
         
-        /* --- Table Styling (Standard/Desktop) --- */
+        .chart-box {
+            background-color: var(--table-bg);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            width: 45%; /* Default for desktop/wide view */
+            min-width: 250px; /* Minimum size for charts */
+            max-width: 400px;
+        }
+
+        /* --- Table Styling --- */
         table {
             width: 100%;
             margin: 0 auto 20px auto;
@@ -97,8 +124,8 @@
             color: #f1f1f1;
         }
 
-        /* --- Input Fields --- */
-        input {
+        /* --- Input Fields (in Table) --- */
+        input:not(#calGoal) {
             width: 100%;
             max-width: 80px;
             box-sizing: border-box;
@@ -200,9 +227,20 @@
         /* ======== MOBILE RESPONSIVENESS ======== */
         /* ======================================= */
 
-        @media only screen and (max-width: 600px) {
+        @media only screen and (max-width: 768px) {
             #app-container {
                 padding: 10px;
+            }
+
+            /* Chart adjustment for mobile */
+            #chart-dashboard {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .chart-box {
+                width: 100%; /* Full width on mobile */
+                max-width: none;
             }
             
             /* Goal Tracker adjustment for mobile */
@@ -299,6 +337,14 @@
                 <span id="remainingCal">2000</span>
             </div>
         </div>
+        <div id="chart-dashboard">
+            <div class="chart-box">
+                <canvas id="calPieChart"></canvas>
+            </div>
+            <div class="chart-box">
+                <canvas id="macroPieChart"></canvas>
+            </div>
+        </div>
         <table id="macroTable">
             <thead>
                 <tr>
@@ -357,6 +403,69 @@
     </div>
 
     <script>
+        let caloriesChart;
+        let macrosChart;
+
+        // Function to create and initialize the charts
+        function initializeCharts() {
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'var(--text-color)'
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += context.raw;
+                                return label;
+                            }
+                        }
+                    }
+                }
+            };
+            
+            // 1. Calorie Goal Chart
+            const calCtx = document.getElementById('calPieChart').getContext('2d');
+            caloriesChart = new Chart(calCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Consumed', 'Remaining'],
+                    datasets: [{
+                        data: [0, 2000], // Initial values
+                        backgroundColor: ['var(--chart-consumed)', 'var(--chart-remaining)'],
+                        borderColor: 'var(--table-bg)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {...chartOptions, title: {display: true, text: 'Calorie Progress'}}
+            });
+
+            // 2. Macro Composition Chart
+            const macroCtx = document.getElementById('macroPieChart').getContext('2d');
+            macrosChart = new Chart(macroCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Fat (g)', 'Carbs (g)', 'Protein (g)'],
+                    datasets: [{
+                        data: [1, 1, 1], // Initial values (avoids empty chart)
+                        backgroundColor: ['var(--chart-fat)', 'var(--chart-carbs)', 'var(--chart-protein)'],
+                        borderColor: 'var(--table-bg)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {...chartOptions, title: {display: true, text: 'Macro Breakdown'}}
+            });
+        }
+
+        // Function to add a new meal row
         function addRow() {
             const tableBody = document.getElementById("tableBody");
             const row = document.createElement("tr");
@@ -370,6 +479,7 @@
             attachListeners(row.querySelectorAll("input"));
         }
 
+        // Main function to calculate totals and update charts
         function calculateTotals() {
             let totalCal = 0, totalFat = 0, totalCarb = 0, totalProt = 0;
             
@@ -381,15 +491,17 @@
 
             // Calculate Remaining Calories
             const calGoal = Number(document.getElementById("calGoal").value) || 0;
-            const remainingCal = calGoal - totalCal;
+            let remainingCal = calGoal - totalCal;
             const remainingElement = document.getElementById("remainingCal");
-
+            
+            // --- Update UI Totals ---
+            
             // Update Remaining Calorie Display and Color
-            remainingElement.innerText = remainingCal;
             remainingElement.classList.remove('over-goal');
             if (remainingCal < 0) {
                 remainingElement.innerText = Math.abs(remainingCal) + " over";
                 remainingElement.classList.add('over-goal');
+                remainingCal = 0; // Use 0 for the chart's "remaining" slice
             } else {
                 remainingElement.innerText = remainingCal;
             }
@@ -405,8 +517,35 @@
             document.getElementById("mobileTotalFat").innerText = totalFat + " g";
             document.getElementById("mobileTotalCarb").innerText = totalCarb + " g";
             document.getElementById("mobileTotalProt").innerText = totalProt + " g";
+            
+            // --- Update Charts ---
+
+            // 1. Calorie Chart Update
+            caloriesChart.data.datasets[0].data = [totalCal, remainingCal];
+            
+            // Change consumed color if goal is exceeded
+            caloriesChart.data.datasets[0].backgroundColor[0] = (totalCal > calGoal && calGoal > 0) ? 
+                'var(--over-goal-color)' : 'var(--chart-consumed)';
+            
+            caloriesChart.update();
+
+            // 2. Macro Chart Update
+            const macroData = [totalFat, totalCarb, totalProt];
+            const totalMacros = totalFat + totalCarb + totalProt;
+            
+            if (totalMacros === 0) {
+                 // Prevent Chart.js from displaying a messy chart when all inputs are 0
+                macrosChart.data.datasets[0].data = [1, 1, 1];
+                macrosChart.data.datasets[0].backgroundColor = ['var(--chart-remaining)', 'var(--chart-remaining)', 'var(--chart-remaining)'];
+                macrosChart.data.labels = ['Fat (g)', 'Carbs (g)', 'Protein (g)'];
+            } else {
+                macrosChart.data.datasets[0].data = macroData;
+                macrosChart.data.datasets[0].backgroundColor = ['var(--chart-fat)', 'var(--chart-carbs)', 'var(--chart-protein)'];
+            }
+            macrosChart.update();
         }
 
+        // Attach listeners to input fields
         function attachListeners(inputs) {
             inputs.forEach(input => {
                 input.addEventListener("input", calculateTotals);
@@ -439,8 +578,12 @@
             document.getElementById("memoryList").prepend(entry);
         }
 
-        // Attach listeners to all existing input fields (the first row) and initialize the totals
-        attachListeners(document.querySelectorAll("input"));
+        // Initialize everything when the page loads
+        window.onload = function() {
+            initializeCharts();
+            // Attach listeners to all existing input fields (the goal and the first row)
+            attachListeners(document.querySelectorAll("input"));
+        };
     </script>
 </body>
 </html>
