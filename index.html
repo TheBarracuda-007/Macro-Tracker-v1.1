@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Macro Tracker</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
         :root {
@@ -100,14 +101,13 @@
             width: 45%; /* Default for desktop/wide view */
             min-width: 250px; /* Minimum size for charts */
             max-width: 400px;
-            display: flex; /* Use flexbox to center canvas */
+            display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        /* Set explicit height for canvas within chart-box to ensure it renders */
         .chart-box canvas {
-            max-height: 250px; /* Adjust as needed */
+            max-height: 250px;
             max-width: 100%;
         }
 
@@ -414,6 +414,10 @@
     <script>
         let caloriesChart;
         let macrosChart;
+        
+        // FIX: Set global defaults for Chart.js to use light colors
+        Chart.defaults.color = 'var(--text-color)';
+        Chart.defaults.font.family = 'Arial, sans-serif';
 
         // Function to create and initialize the charts
         function initializeCharts() {
@@ -423,7 +427,10 @@
                 plugins: {
                     legend: {
                         labels: {
-                            color: 'var(--text-color)'
+                            color: 'var(--text-color)', // Use CSS variable for legend text
+                            font: {
+                                size: 12
+                            }
                         }
                     },
                     tooltip: {
@@ -433,14 +440,15 @@
                                 if (label) {
                                     label += ': ';
                                 }
+                                // Display value and ensure it's a number (or "over")
                                 label += context.raw;
                                 return label;
                             }
                         }
                     },
-                     title: { // Add title options directly here
+                     title: { 
                         display: true,
-                        color: 'var(--text-color)',
+                        color: 'var(--text-color)', // Use CSS variable for title
                         font: {
                             size: 16
                         },
@@ -496,7 +504,7 @@
                         ...chartOptions.plugins, 
                         title: {
                             ...chartOptions.plugins.title,
-                            text: 'Macro Breakdown'
+                            text: 'Macro Breakdown (g)'
                         }
                     }
                 }
@@ -566,6 +574,12 @@
             caloriesChart.data.datasets[0].backgroundColor[0] = (totalCal > calGoal && calGoal > 0) ? 
                 'var(--over-goal-color)' : 'var(--chart-consumed)';
             
+            // Only show a consumed slice if we've actually consumed something
+            if (totalCal === 0 && remainingCalChart > 0) {
+                caloriesChart.data.datasets[0].data = [0, calGoal];
+                caloriesChart.data.datasets[0].backgroundColor[0] = 'var(--chart-remaining)';
+            }
+            
             caloriesChart.update();
 
             // 2. Macro Chart Update
@@ -573,12 +587,12 @@
             const totalMacros = totalFat + totalCarb + totalProt;
             
             if (totalMacros === 0) {
-                 // Prevent Chart.js from displaying a messy chart when all inputs are 0
-                 // Instead, show a single grey slice if all are zero.
+                // If no macros, display a single "No Data" slice
                 macrosChart.data.labels = ['No Data'];
-                macrosChart.data.datasets[0].data = [1]; // A single slice representing no data
+                macrosChart.data.datasets[0].data = [1]; 
                 macrosChart.data.datasets[0].backgroundColor = ['var(--chart-remaining)'];
             } else {
+                // Display actual macro breakdown
                 macrosChart.data.labels = ['Fat (g)', 'Carbs (g)', 'Protein (g)'];
                 macrosChart.data.datasets[0].data = macroData;
                 macrosChart.data.datasets[0].backgroundColor = ['var(--chart-fat)', 'var(--chart-carbs)', 'var(--chart-protein)'];
