@@ -15,13 +15,17 @@
       --header-bg: #282828;
       --border-color: #333;
       --input-bg: #121212;
-
       --chart-consumed: #ffc107;
       --chart-remaining: #333;
       --chart-fat: #ff9800;
       --chart-carbs: #2196f3;
       --chart-protein: #e91e63;
+      --water-color: #29b6f6;
+      --green: #4caf50;
+      --red: #ff4d4d;
     }
+
+    * { box-sizing: border-box; }
 
     body {
       font-family: Arial, sans-serif;
@@ -33,7 +37,7 @@
 
     #app-container {
       padding: 20px;
-      max-width: 900px;
+      max-width: 960px;
       margin: auto;
     }
 
@@ -43,12 +47,58 @@
       margin-bottom: 20px;
     }
 
+    /* ── Date Picker ── */
+    #date-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      background: var(--header-bg);
+      border-radius: 10px;
+      padding: 12px 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      flex-wrap: wrap;
+    }
+
+    #date-bar button {
+      background: var(--border-color);
+      color: var(--text-color);
+      border: none;
+      border-radius: 6px;
+      padding: 6px 14px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    #date-bar button:hover { background: #444; }
+
+    #currentDateLabel {
+      font-size: 16px;
+      font-weight: bold;
+      color: var(--accent-color);
+      min-width: 140px;
+      text-align: center;
+    }
+
+    #dateInput {
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: var(--text-color);
+      padding: 5px 8px;
+      font-size: 14px;
+      color-scheme: dark;
+    }
+
+    /* ── Goal Tracker ── */
     #goal-tracker {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 15px 20px;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
       background: var(--header-bg);
       border-radius: 10px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.5);
@@ -56,12 +106,10 @@
       gap: 10px;
     }
 
-    #goal-tracker label, #goal-tracker span {
-      font-weight: bold;
-    }
+    #goal-tracker label { font-weight: bold; }
 
-    #goal-tracker #calGoal {
-      max-width: 100px;
+    .goal-input {
+      max-width: 90px;
       text-align: right;
       background: var(--input-bg);
       border: 1px solid var(--border-color);
@@ -70,13 +118,69 @@
       padding: 5px;
     }
 
-    #remainingCal {
-      color: var(--accent-color);
-    }
-    .over-goal {
-      color: var(--over-goal-color) !important;
+    #remainingCal { color: var(--accent-color); font-weight: bold; }
+    .over-goal { color: var(--over-goal-color) !important; }
+
+    /* ── Macro Progress Bars ── */
+    #macro-goals-bar {
+      background: var(--header-bg);
+      border-radius: 10px;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
     }
 
+    #macro-goals-bar h4 {
+      margin: 0 0 12px 0;
+      color: var(--accent-color);
+      text-align: center;
+    }
+
+    .macro-goal-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .macro-goal-row label {
+      width: 80px;
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    .macro-goal-row input.goal-input {
+      width: 70px;
+    }
+
+    .progress-wrap {
+      flex: 1;
+      background: var(--border-color);
+      border-radius: 20px;
+      height: 14px;
+      min-width: 80px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      border-radius: 20px;
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+
+    .bar-fat    { background: var(--chart-fat); }
+    .bar-carbs  { background: var(--chart-carbs); }
+    .bar-protein{ background: var(--chart-protein); }
+
+    .macro-goal-row .macro-stat {
+      font-size: 12px;
+      min-width: 80px;
+      text-align: right;
+    }
+
+    /* ── Charts ── */
     #chart-dashboard {
       display: flex;
       justify-content: space-around;
@@ -104,6 +208,7 @@
       border-radius: 8px;
     }
 
+    /* ── Table ── */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -119,11 +224,9 @@
       text-align: center;
     }
 
-    th {
-      background: var(--header-bg);
-    }
+    th { background: var(--header-bg); }
 
-    input:not(#calGoal) {
+    input.cell-input {
       width: 100%;
       max-width: 80px;
       text-align: center;
@@ -134,6 +237,37 @@
       padding: 5px;
     }
 
+    input.name-input {
+      width: 100%;
+      max-width: 130px;
+      text-align: left;
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      color: var(--text-color);
+      padding: 5px;
+    }
+
+    .delete-btn {
+      background: transparent;
+      border: none;
+      color: var(--red);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: background 0.2s;
+      line-height: 1;
+    }
+    .delete-btn:hover { background: rgba(255,77,77,0.15); }
+
+    #macroTable tfoot td {
+      font-weight: bold;
+      background: var(--header-bg);
+      color: var(--accent-color);
+    }
+
+    /* ── Buttons ── */
     button {
       padding: 10px 16px;
       margin: 5px;
@@ -145,12 +279,73 @@
       color: var(--text-color);
       transition: background 0.2s, transform 0.1s;
     }
+    button:hover { background: var(--border-color); transform: scale(1.03); }
 
-    button:hover {
-      background: var(--border-color);
-      transform: scale(1.03);
+    /* ── Water Tracker ── */
+    #water-tracker {
+      background: var(--table-bg);
+      border-radius: 10px;
+      padding: 15px 20px;
+      margin-top: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
     }
 
+    #water-tracker h3 {
+      margin: 0 0 12px 0;
+      color: var(--water-color);
+      text-align: center;
+    }
+
+    #water-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    #water-controls label { font-weight: bold; }
+
+    #waterGoalInput {
+      width: 80px;
+      text-align: center;
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      color: var(--text-color);
+      padding: 5px;
+    }
+
+    .water-cup-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+
+    .cup {
+      font-size: 28px;
+      cursor: pointer;
+      transition: transform 0.15s, filter 0.15s;
+      filter: grayscale(1) opacity(0.35);
+      user-select: none;
+    }
+    .cup.filled {
+      filter: none;
+      transform: scale(1.1);
+    }
+    .cup:hover { transform: scale(1.2); }
+
+    #waterStatus {
+      text-align: center;
+      font-weight: bold;
+      color: var(--water-color);
+      font-size: 14px;
+    }
+
+    /* ── Memory ── */
     #memory {
       margin-top: 30px;
       padding: 15px;
@@ -171,15 +366,12 @@
       margin: 6px 0;
       border-radius: 6px;
       border: 1px solid var(--border-color);
-      white-space: pre-wrap;
+      font-size: 13px;
     }
 
-    #macroTable tfoot td {
-      font-weight: bold;
-      background: var(--header-bg);
-      color: var(--accent-color);
-    }
+    .memory-entry strong { color: var(--accent-color); }
 
+    /* ── Mobile Totals ── */
     #mobileTotals {
       display: none;
       margin-top: 20px;
@@ -194,40 +386,32 @@
       padding: 12px 15px;
       border-bottom: 1px solid var(--border-color);
     }
-    .total-row:last-child {
-      border-bottom: none;
-    }
-    .total-label {
-      font-weight: bold;
-      color: var(--accent-color);
-    }
-    .total-value {
-      font-weight: bold;
-    }
+    .total-row:last-child { border-bottom: none; }
+    .total-label { font-weight: bold; color: var(--accent-color); }
+    .total-value { font-weight: bold; }
 
-    /* Mobile */
+    /* ── Cal-from-macros note ── */
+    #calWarning {
+      text-align: center;
+      font-size: 12px;
+      color: #aaa;
+      margin-top: 6px;
+    }
+    #calWarning.mismatch { color: var(--over-goal-color); }
+
+    /* ── Mobile ── */
     @media (max-width: 768px) {
-      #goal-tracker {
-        flex-direction: column;
-        align-items: stretch;
-      }
+      #goal-tracker { flex-direction: column; align-items: stretch; }
+      .chart-box { width: 100%; }
 
-      .chart-box {
-        width: 100%;
-      }
-
-      table, thead, tbody, th, td, tr {
-        display: block;
-      }
-
-      thead, tfoot {
-        display: none;
-      }
+      table, thead, tbody, th, td, tr { display: block; }
+      thead, tfoot { display: none; }
 
       tr {
         border: 1px solid var(--border-color);
         margin-bottom: 10px;
         border-radius: 10px;
+        position: relative;
       }
 
       td {
@@ -248,220 +432,509 @@
         text-align: left;
       }
 
-      td input {
-        width: 100%;
-      }
+      td input { width: 100%; }
+      #mobileTotals { display: block; }
 
-      #mobileTotals {
-        display: block;
-      }
+      .macro-goal-row { gap: 6px; }
+      .macro-goal-row label { width: 60px; }
     }
   </style>
 </head>
 <body>
-  <div id="app-container">
-    <h2>🌙 Daily Macro Tracker</h2>
+<div id="app-container">
+  <h2>🌙 Daily Macro Tracker</h2>
 
-    <div id="goal-tracker">
-      <div>
-        <label for="calGoal">Calorie Goal:</label>
-        <input type="number" id="calGoal" value="2000" oninput="calculateTotals()">
-      </div>
-      <div>
-        <span>Remaining:</span>
-        <span id="remainingCal">2000</span>
-      </div>
+  <!-- Date Picker -->
+  <div id="date-bar">
+    <button onclick="shiftDate(-1)">◀</button>
+    <span id="currentDateLabel"></span>
+    <input type="date" id="dateInput" onchange="onDateChange()">
+    <button onclick="shiftDate(1)">▶</button>
+    <button onclick="goToday()" style="font-size:13px;padding:6px 10px;">Today</button>
+  </div>
+
+  <!-- Calorie Goal -->
+  <div id="goal-tracker">
+    <div>
+      <label for="calGoal">Calorie Goal:</label>
+      <input type="number" id="calGoal" class="goal-input" value="2000" oninput="saveGoals(); calculateTotals()">
     </div>
-
-    <div id="chart-dashboard">
-      <div class="chart-box">
-        <canvas id="calPieChart"></canvas>
-      </div>
-      <div class="chart-box">
-        <canvas id="macroPieChart"></canvas>
-      </div>
+    <div>
+      <span>Logged Calories: </span>
+      <span id="loggedCal" style="font-weight:bold">0</span>
+      &nbsp;|&nbsp;
+      <span>From Macros: </span>
+      <span id="macroCalDisplay" style="font-weight:bold; color:var(--accent-color)">0</span>
     </div>
-
-    <table id="macroTable">
-      <thead>
-        <tr>
-          <th>Calories</th>
-          <th>Fat (g)</th>
-          <th>Carbs (g)</th>
-          <th>Protein (g)</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody">
-        <tr>
-          <td data-label="Calories"><input type="number" class="cal"></td>
-          <td data-label="Fat (g)"><input type="number" class="fat"></td>
-          <td data-label="Carbs (g)"><input type="number" class="carb"></td>
-          <td data-label="Protein (g)"><input type="number" class="prot"></td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <tr>
-          <td id="totalCal">0</td>
-          <td id="totalFat">0</td>
-          <td id="totalCarb">0</td>
-          <td id="totalProt">0</td>
-        </tr>
-      </tfoot>
-    </table>
-
-    <div id="mobileTotals">
-      <div class="total-row"><span class="total-label">Calories</span><span class="total-value" id="mobileTotalCal">0</span></div>
-      <div class="total-row"><span class="total-label">Fat</span><span class="total-value" id="mobileTotalFat">0 g</span></div>
-      <div class="total-row"><span class="total-label">Carbs</span><span class="total-value" id="mobileTotalCarb">0 g</span></div>
-      <div class="total-row"><span class="total-label">Protein</span><span class="total-value" id="mobileTotalProt">0 g</span></div>
+    <div>
+      <span>Remaining: </span>
+      <span id="remainingCal">2000</span>
     </div>
+  </div>
+  <div id="calWarning">Calorie calculation uses macro balance: Carbs & Protein = 4 cal/g · Fat = 9 cal/g</div>
 
-    <div style="text-align:center;">
-      <button onclick="addRow()">➕ Add Meal</button>
-      <button onclick="saveTotals()">💾 Save Totals</button>
+  <!-- Macro Goals + Progress Bars -->
+  <div id="macro-goals-bar">
+    <h4>Macro Goals</h4>
+    <div class="macro-goal-row">
+      <label style="color:var(--chart-fat)">🟠 Fat</label>
+      <input type="number" id="fatGoal" class="goal-input" value="65" oninput="saveGoals(); calculateTotals()">
+      <span style="font-size:12px;color:#aaa">g</span>
+      <div class="progress-wrap"><div class="progress-bar bar-fat" id="fatBar"></div></div>
+      <span class="macro-stat" id="fatStat">0 / 65 g</span>
     </div>
-
-    <div id="memory">
-      <h3>📒 Saved Totals</h3>
-      <div id="memoryList"></div>
+    <div class="macro-goal-row">
+      <label style="color:var(--chart-carbs)">🔵 Carbs</label>
+      <input type="number" id="carbGoal" class="goal-input" value="250" oninput="saveGoals(); calculateTotals()">
+      <span style="font-size:12px;color:#aaa">g</span>
+      <div class="progress-wrap"><div class="progress-bar bar-carbs" id="carbBar"></div></div>
+      <span class="macro-stat" id="carbStat">0 / 250 g</span>
+    </div>
+    <div class="macro-goal-row">
+      <label style="color:var(--chart-protein)">🔴 Protein</label>
+      <input type="number" id="protGoal" class="goal-input" value="150" oninput="saveGoals(); calculateTotals()">
+      <span style="font-size:12px;color:#aaa">g</span>
+      <div class="progress-wrap"><div class="progress-bar bar-protein" id="protBar"></div></div>
+      <span class="macro-stat" id="protStat">0 / 150 g</span>
     </div>
   </div>
 
-  <script>
-    let caloriesChart, macrosChart;
+  <!-- Charts -->
+  <div id="chart-dashboard">
+    <div class="chart-box"><canvas id="calPieChart"></canvas></div>
+    <div class="chart-box"><canvas id="macroPieChart"></canvas></div>
+  </div>
 
-    function getCSSVar(name) {
-      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-    }
+  <!-- Meal Table -->
+  <table id="macroTable">
+    <thead>
+      <tr>
+        <th>Meal Name</th>
+        <th>Calories</th>
+        <th>Fat (g)</th>
+        <th>Carbs (g)</th>
+        <th>Protein (g)</th>
+        <th>Cal from Macros</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+    <tfoot>
+      <tr>
+        <td>Total</td>
+        <td id="totalCal">0</td>
+        <td id="totalFat">0</td>
+        <td id="totalCarb">0</td>
+        <td id="totalProt">0</td>
+        <td id="totalMacroCal">0</td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
 
-    function initializeCharts() {
-      const options = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            labels: { color: getCSSVar('--text-color') }
-          },
-          title: {
-            display: true,
-            color: getCSSVar('--text-color'),
-            font: { size: 16 }
-          }
-        }
-      };
+  <!-- Mobile Totals -->
+  <div id="mobileTotals">
+    <div class="total-row"><span class="total-label">Calories</span><span class="total-value" id="mobileTotalCal">0</span></div>
+    <div class="total-row"><span class="total-label">Fat</span><span class="total-value" id="mobileTotalFat">0 g</span></div>
+    <div class="total-row"><span class="total-label">Carbs</span><span class="total-value" id="mobileTotalCarb">0 g</span></div>
+    <div class="total-row"><span class="total-label">Protein</span><span class="total-value" id="mobileTotalProt">0 g</span></div>
+    <div class="total-row"><span class="total-label">Cal from Macros</span><span class="total-value" id="mobileTotalMacroCal">0</span></div>
+  </div>
 
-      const calCtx = document.getElementById('calPieChart').getContext('2d');
-      caloriesChart = new Chart(calCtx, {
-        type: 'doughnut',
-        data: {
-          labels: ['Consumed', 'Remaining'],
-          datasets: [{
-            data: [0, 2000],
-            backgroundColor: [getCSSVar('--chart-consumed'), getCSSVar('--chart-remaining')],
-            borderColor: getCSSVar('--table-bg'),
-            borderWidth: 2
-          }]
-        },
-        options: { ...options, plugins: { ...options.plugins, title: { ...options.plugins.title, text: 'Calorie Progress' } } }
+  <div style="text-align:center; margin-top: 14px;">
+    <button onclick="addRow()">➕ Add Meal</button>
+    <button onclick="saveDay()">💾 Save Day</button>
+    <button onclick="clearDay()" style="color:#ff9090;">🗑️ Clear Day</button>
+  </div>
+
+  <!-- Water Tracker -->
+  <div id="water-tracker">
+    <h3>💧 Water Intake</h3>
+    <div id="water-controls">
+      <label>Daily Goal:</label>
+      <input type="number" id="waterGoalInput" value="2500" min="100" max="10000" step="100" oninput="updateWaterGoal()">
+      <span style="font-size:13px;color:#aaa">ml</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:10px;flex-wrap:wrap;">
+      <button onclick="adjustWater(-500)" style="font-size:13px;padding:6px 12px;">−500ml</button>
+      <button onclick="adjustWater(-250)" style="font-size:13px;padding:6px 12px;">−250ml</button>
+      <button onclick="adjustWater(250)"  style="font-size:13px;padding:6px 12px;">+250ml</button>
+      <button onclick="adjustWater(500)"  style="font-size:13px;padding:6px 12px;">+500ml</button>
+    </div>
+    <div style="margin:0 auto 10px;max-width:400px;">
+      <div class="progress-wrap" style="height:20px;border-radius:20px;">
+        <div id="waterBar" class="progress-bar" style="background:var(--water-color);height:100%;border-radius:20px;transition:width 0.3s;width:0%"></div>
+      </div>
+    </div>
+    <div id="waterStatus" style="text-align:center;font-weight:bold;color:var(--water-color);font-size:15px;">0 / 2500 ml</div>
+  </div>
+
+  <!-- Saved History -->
+  <div id="memory">
+    <h3>📒 Saved History</h3>
+    <div id="memoryList"></div>
+  </div>
+</div>
+
+<script>
+  // ── State ──────────────────────────────────────────────────────────────────
+  let currentDate = todayStr();
+  let caloriesChart, macrosChart;
+  let waterFilled = 0;
+
+  function todayStr() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  function storageKey(suffix) {
+    return `macroTracker_${currentDate}_${suffix}`;
+  }
+
+  // ── Date ───────────────────────────────────────────────────────────────────
+  function shiftDate(delta) {
+    const d = new Date(currentDate + 'T00:00:00');
+    d.setDate(d.getDate() + delta);
+    currentDate = d.toISOString().slice(0, 10);
+    loadDate();
+  }
+
+  function goToday() {
+    currentDate = todayStr();
+    loadDate();
+  }
+
+  function onDateChange() {
+    currentDate = document.getElementById('dateInput').value;
+    updateDateLabel();
+    loadDayData();
+  }
+
+  function updateDateLabel() {
+    document.getElementById('dateInput').value = currentDate;
+    const d = new Date(currentDate + 'T00:00:00');
+    const opts = { weekday: 'short', month: 'short', day: 'numeric' };
+    document.getElementById('currentDateLabel').textContent = d.toLocaleDateString(undefined, opts);
+  }
+
+  function loadDate() {
+    updateDateLabel();
+    loadDayData();
+  }
+
+  // ── Persist Goals (shared across dates) ───────────────────────────────────
+  function saveGoals() {
+    localStorage.setItem('macroTracker_goals', JSON.stringify({
+      cal: document.getElementById('calGoal').value,
+      fat: document.getElementById('fatGoal').value,
+      carb: document.getElementById('carbGoal').value,
+      prot: document.getElementById('protGoal').value,
+      water: document.getElementById('waterGoalInput').value || 2500,
+    }));
+  }
+
+  function loadGoals() {
+    const g = JSON.parse(localStorage.getItem('macroTracker_goals') || 'null');
+    if (!g) return;
+    document.getElementById('calGoal').value = g.cal || 2000;
+    document.getElementById('fatGoal').value = g.fat || 65;
+    document.getElementById('carbGoal').value = g.carb || 250;
+    document.getElementById('protGoal').value = g.prot || 150;
+    document.getElementById('waterGoalInput').value = g.water || 2500;
+  }
+
+  // ── Persist Day Data ───────────────────────────────────────────────────────
+  function collectRows() {
+    const rows = [];
+    document.querySelectorAll('#tableBody tr').forEach(tr => {
+      rows.push({
+        name: tr.querySelector('.name-input')?.value || '',
+        cal:  tr.querySelector('.cal')?.value  || '',
+        fat:  tr.querySelector('.fat')?.value  || '',
+        carb: tr.querySelector('.carb')?.value || '',
+        prot: tr.querySelector('.prot')?.value || '',
       });
+    });
+    return rows;
+  }
 
-      const macroCtx = document.getElementById('macroPieChart').getContext('2d');
-      macrosChart = new Chart(macroCtx, {
-        type: 'doughnut',
-        data: {
-          labels: ['Fat (g)', 'Carbs (g)', 'Protein (g)'],
-          datasets: [{
-            data: [0, 0, 0],
-            backgroundColor: [getCSSVar('--chart-fat'), getCSSVar('--chart-carbs'), getCSSVar('--chart-protein')],
-            borderColor: getCSSVar('--table-bg'),
-            borderWidth: 2
-          }]
-        },
-        options: { ...options, plugins: { ...options.plugins, title: { ...options.plugins.title, text: 'Macro Breakdown' } } }
-      });
-    }
-
-    function addRow() {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td data-label="Calories"><input type="number" class="cal"></td>
-        <td data-label="Fat (g)"><input type="number" class="fat"></td>
-        <td data-label="Carbs (g)"><input type="number" class="carb"></td>
-        <td data-label="Protein (g)"><input type="number" class="prot"></td>`;
-      document.getElementById("tableBody").appendChild(row);
-      attachListeners(row.querySelectorAll("input"));
-    }
-
-    function calculateTotals() {
-      let cal = 0, fat = 0, carb = 0, prot = 0;
-      document.querySelectorAll(".cal").forEach(i => cal += Number(i.value) || 0);
-      document.querySelectorAll(".fat").forEach(i => fat += Number(i.value) || 0);
-      document.querySelectorAll(".carb").forEach(i => carb += Number(i.value) || 0);
-      document.querySelectorAll(".prot").forEach(i => prot += Number(i.value) || 0);
-
-      const goal = Number(document.getElementById("calGoal").value) || 0;
-      const remaining = goal - cal;
-      const remainingEl = document.getElementById("remainingCal");
-      remainingEl.classList.remove("over-goal");
-      if (remaining < 0) {
-        remainingEl.textContent = Math.abs(remaining) + " over";
-        remainingEl.classList.add("over-goal");
-      } else {
-        remainingEl.textContent = remaining;
-      }
-
-      document.getElementById("totalCal").textContent = cal;
-      document.getElementById("totalFat").textContent = fat;
-      document.getElementById("totalCarb").textContent = carb;
-      document.getElementById("totalProt").textContent = prot;
-
-      document.getElementById("mobileTotalCal").textContent = cal;
-      document.getElementById("mobileTotalFat").textContent = fat + " g";
-      document.getElementById("mobileTotalCarb").textContent = carb + " g";
-      document.getElementById("mobileTotalProt").textContent = prot + " g";
-
-      caloriesChart.data.datasets[0].data = [cal, Math.max(0, goal - cal)];
-      caloriesChart.data.datasets[0].backgroundColor[0] = cal > goal ? getCSSVar('--over-goal-color') : getCSSVar('--chart-consumed');
-      caloriesChart.update();
-
-      if (fat + carb + prot === 0) {
-        macrosChart.data.labels = ['No Data'];
-        macrosChart.data.datasets[0].data = [1];
-        macrosChart.data.datasets[0].backgroundColor = [getCSSVar('--chart-remaining')];
-      } else {
-        macrosChart.data.labels = ['Fat (g)', 'Carbs (g)', 'Protein (g)'];
-        macrosChart.data.datasets[0].data = [fat, carb, prot];
-        macrosChart.data.datasets[0].backgroundColor = [getCSSVar('--chart-fat'), getCSSVar('--chart-carbs'), getCSSVar('--chart-protein')];
-      }
-      macrosChart.update();
-    }
-
-    function attachListeners(inputs) {
-      inputs.forEach(i => i.addEventListener("input", calculateTotals));
-      calculateTotals();
-    }
-
-    function saveTotals() {
-      const cal = document.getElementById("totalCal").textContent;
-      const fat = document.getElementById("totalFat").textContent;
-      const carb = document.getElementById("totalCarb").textContent;
-      const prot = document.getElementById("totalProt").textContent;
-      if (+cal + +fat + +carb + +prot === 0) {
-        alert("Nothing to save!");
-        return;
-      }
-      const now = new Date();
-      const entry = document.createElement("div");
-      entry.classList.add("memory-entry");
-      entry.innerHTML = `<strong>${now.toLocaleDateString()} @ ${now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</strong><br>
-      Calories: ${cal}, Fat: ${fat}g, Carbs: ${carb}g, Protein: ${prot}g`;
-      document.getElementById("memoryList").prepend(entry);
-    }
-
-    window.onload = () => {
-      initializeCharts();
-      attachListeners(document.querySelectorAll("input"));
+  function saveDayToStorage() {
+    const data = {
+      rows: collectRows(),
+      water: waterFilled,
     };
-  </script>
+    localStorage.setItem(storageKey('day'), JSON.stringify(data));
+  }
+
+  function loadDayData() {
+    // Clear table
+    document.getElementById('tableBody').innerHTML = '';
+    const raw = localStorage.getItem(storageKey('day'));
+    const data = raw ? JSON.parse(raw) : null;
+
+    if (data && data.rows && data.rows.length > 0) {
+      data.rows.forEach(r => addRow(r));
+      waterFilled = data.water || 0;
+    } else {
+      addRow(); // at least one blank row
+      waterFilled = 0;
+    }
+
+    renderCups();
+    calculateTotals();
+  }
+
+  function saveDay() {
+    saveDayToStorage();
+    // Also write to history log
+    const cal = document.getElementById('totalCal').textContent;
+    const fat = document.getElementById('totalFat').textContent;
+    const carb = document.getElementById('totalCarb').textContent;
+    const prot = document.getElementById('totalProt').textContent;
+    const macroCal = document.getElementById('totalMacroCal').textContent;
+    const water = waterFilled;
+    const waterGoal = document.getElementById('waterGoalInput').value;
+
+    if (+cal + +fat + +carb + +prot === 0) { alert('Nothing to save!'); return; }
+
+    const historyKey = 'macroTracker_history';
+    const history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+    // Remove existing entry for same date
+    const filtered = history.filter(e => e.date !== currentDate);
+    filtered.unshift({ date: currentDate, cal, fat, carb, prot, macroCal, water, waterGoal });
+    localStorage.setItem(historyKey, JSON.stringify(filtered));
+    renderHistory();
+    alert('Day saved! ✅');
+  }
+
+  function clearDay() {
+    if (!confirm('Clear all data for this day?')) return;
+    localStorage.removeItem(storageKey('day'));
+    loadDayData();
+  }
+
+  // ── Row Management ─────────────────────────────────────────────────────────
+  function addRow(data = {}) {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td data-label="Meal Name"><input type="text" class="name-input" placeholder="e.g. Breakfast" value="${data.name || ''}"></td>
+      <td data-label="Calories"><input type="number" class="cal cell-input" value="${data.cal || ''}"></td>
+      <td data-label="Fat (g)"><input type="number" class="fat cell-input" value="${data.fat || ''}"></td>
+      <td data-label="Carbs (g)"><input type="number" class="carb cell-input" value="${data.carb || ''}"></td>
+      <td data-label="Protein (g)"><input type="number" class="prot cell-input" value="${data.prot || ''}"></td>
+      <td data-label="Cal from Macros" class="row-macro-cal">0</td>
+      <td><button class="delete-btn" onclick="deleteRow(this)" title="Remove meal">✕</button></td>`;
+    document.getElementById('tableBody').appendChild(row);
+    row.querySelectorAll('input').forEach(i => {
+      i.addEventListener('input', () => { updateRowMacroCal(row); calculateTotals(); saveDayToStorage(); });
+    });
+    updateRowMacroCal(row);
+    calculateTotals();
+  }
+
+  function deleteRow(btn) {
+    const row = btn.closest('tr');
+    if (document.querySelectorAll('#tableBody tr').length === 1) {
+      // Don't delete last row, just clear it
+      row.querySelectorAll('input').forEach(i => i.value = '');
+      updateRowMacroCal(row);
+    } else {
+      row.remove();
+    }
+    calculateTotals();
+    saveDayToStorage();
+  }
+
+  function updateRowMacroCal(row) {
+    const fat  = Number(row.querySelector('.fat')?.value)  || 0;
+    const carb = Number(row.querySelector('.carb')?.value) || 0;
+    const prot = Number(row.querySelector('.prot')?.value) || 0;
+    const cal = fat * 9 + carb * 4 + prot * 4;
+    const cell = row.querySelector('.row-macro-cal');
+    if (cell) cell.textContent = cal || 0;
+  }
+
+  // ── Calculations ───────────────────────────────────────────────────────────
+  function getCSSVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  function calculateTotals() {
+    let cal = 0, fat = 0, carb = 0, prot = 0;
+    document.querySelectorAll('.cal').forEach(i  => cal  += Number(i.value) || 0);
+    document.querySelectorAll('.fat').forEach(i  => fat  += Number(i.value) || 0);
+    document.querySelectorAll('.carb').forEach(i => carb += Number(i.value) || 0);
+    document.querySelectorAll('.prot').forEach(i => prot += Number(i.value) || 0);
+
+    // Calories calculated from macros
+    const macroCal = fat * 9 + carb * 4 + prot * 4;
+    // Use macroCal as the authoritative calorie count for goal progress
+    const usedCal = macroCal || cal; // fall back to logged if no macros entered
+
+    const goal     = Number(document.getElementById('calGoal').value) || 0;
+    const fatGoal  = Number(document.getElementById('fatGoal').value) || 1;
+    const carbGoal = Number(document.getElementById('carbGoal').value) || 1;
+    const protGoal = Number(document.getElementById('protGoal').value) || 1;
+
+    const remaining = goal - usedCal;
+    const remainingEl = document.getElementById('remainingCal');
+    remainingEl.classList.remove('over-goal');
+    if (remaining < 0) {
+      remainingEl.textContent = Math.abs(remaining) + ' over';
+      remainingEl.classList.add('over-goal');
+    } else {
+      remainingEl.textContent = remaining;
+    }
+
+    document.getElementById('loggedCal').textContent = cal;
+    document.getElementById('macroCalDisplay').textContent = macroCal;
+
+    // Cal mismatch warning
+    const warn = document.getElementById('calWarning');
+    if (cal > 0 && macroCal > 0 && Math.abs(cal - macroCal) > 50) {
+      warn.textContent = `⚠️ Logged calories (${cal}) differ from macro-calculated (${macroCal}) by ${Math.abs(cal - macroCal)} cal — using macro calc for goal.`;
+      warn.classList.add('mismatch');
+    } else {
+      warn.textContent = 'Calorie calculation uses macro balance: Carbs & Protein = 4 cal/g · Fat = 9 cal/g';
+      warn.classList.remove('mismatch');
+    }
+
+    document.getElementById('totalCal').textContent = cal;
+    document.getElementById('totalFat').textContent = fat;
+    document.getElementById('totalCarb').textContent = carb;
+    document.getElementById('totalProt').textContent = prot;
+    document.getElementById('totalMacroCal').textContent = macroCal;
+
+    document.getElementById('mobileTotalCal').textContent = cal;
+    document.getElementById('mobileTotalFat').textContent = fat + ' g';
+    document.getElementById('mobileTotalCarb').textContent = carb + ' g';
+    document.getElementById('mobileTotalProt').textContent = prot + ' g';
+    document.getElementById('mobileTotalMacroCal').textContent = macroCal;
+
+    // Progress bars
+    const clamp = (v, max) => Math.min(100, (v / max) * 100);
+    document.getElementById('fatBar').style.width  = clamp(fat,  fatGoal)  + '%';
+    document.getElementById('carbBar').style.width = clamp(carb, carbGoal) + '%';
+    document.getElementById('protBar').style.width = clamp(prot, protGoal) + '%';
+    document.getElementById('fatStat').textContent  = `${fat} / ${fatGoal} g`;
+    document.getElementById('carbStat').textContent = `${carb} / ${carbGoal} g`;
+    document.getElementById('protStat').textContent = `${prot} / ${protGoal} g`;
+
+    // Charts
+    caloriesChart.data.datasets[0].data = [usedCal, Math.max(0, goal - usedCal)];
+    caloriesChart.data.datasets[0].backgroundColor[0] = usedCal > goal
+      ? getCSSVar('--over-goal-color') : getCSSVar('--chart-consumed');
+    caloriesChart.update();
+
+    if (fat + carb + prot === 0) {
+      macrosChart.data.labels = ['No Data'];
+      macrosChart.data.datasets[0].data = [1];
+      macrosChart.data.datasets[0].backgroundColor = [getCSSVar('--chart-remaining')];
+    } else {
+      macrosChart.data.labels = ['Fat (g)', 'Carbs (g)', 'Protein (g)'];
+      macrosChart.data.datasets[0].data = [fat, carb, prot];
+      macrosChart.data.datasets[0].backgroundColor = [
+        getCSSVar('--chart-fat'), getCSSVar('--chart-carbs'), getCSSVar('--chart-protein')
+      ];
+    }
+    macrosChart.update();
+  }
+
+  // ── Charts ─────────────────────────────────────────────────────────────────
+  function initializeCharts() {
+    const opts = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: getCSSVar('--text-color') } },
+        title: { display: true, color: getCSSVar('--text-color'), font: { size: 16 } }
+      }
+    };
+
+    const calCtx = document.getElementById('calPieChart').getContext('2d');
+    caloriesChart = new Chart(calCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Consumed', 'Remaining'],
+        datasets: [{
+          data: [0, 2000],
+          backgroundColor: [getCSSVar('--chart-consumed'), getCSSVar('--chart-remaining')],
+          borderColor: getCSSVar('--table-bg'),
+          borderWidth: 2
+        }]
+      },
+      options: { ...opts, plugins: { ...opts.plugins, title: { ...opts.plugins.title, text: 'Calorie Progress' } } }
+    });
+
+    const macroCtx = document.getElementById('macroPieChart').getContext('2d');
+    macrosChart = new Chart(macroCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Fat (g)', 'Carbs (g)', 'Protein (g)'],
+        datasets: [{
+          data: [0, 0, 0],
+          backgroundColor: [getCSSVar('--chart-fat'), getCSSVar('--chart-carbs'), getCSSVar('--chart-protein')],
+          borderColor: getCSSVar('--table-bg'),
+          borderWidth: 2
+        }]
+      },
+      options: { ...opts, plugins: { ...opts.plugins, title: { ...opts.plugins.title, text: 'Macro Breakdown' } } }
+    });
+  }
+
+  // ── Water ──────────────────────────────────────────────────────────────────
+  function renderCups() { updateWaterUI(); }
+
+  function updateWaterGoal() { saveGoals(); updateWaterUI(); }
+
+  function adjustWater(delta) {
+    const goal = parseInt(document.getElementById('waterGoalInput').value) || 2500;
+    waterFilled = Math.max(0, Math.min(goal, waterFilled + delta));
+    updateWaterUI();
+    saveDayToStorage();
+  }
+
+  function updateWaterUI() {
+    const goal = parseInt(document.getElementById('waterGoalInput').value) || 2500;
+    if (waterFilled > goal) waterFilled = goal;
+    const pct = Math.min(100, (waterFilled / goal) * 100);
+    document.getElementById('waterBar').style.width = pct + '%';
+    const status = document.getElementById('waterStatus');
+    status.textContent = `${waterFilled} / ${goal} ml`;
+    status.style.color = waterFilled >= goal ? 'var(--green)' : 'var(--water-color)';
+    saveDayToStorage();
+  }
+
+  // ── History ────────────────────────────────────────────────────────────────
+  function renderHistory() {
+    const history = JSON.parse(localStorage.getItem('macroTracker_history') || '[]');
+    const list = document.getElementById('memoryList');
+    list.innerHTML = '';
+    if (history.length === 0) {
+      list.innerHTML = '<div style="text-align:center;color:#666;font-size:13px;">No saved entries yet.</div>';
+      return;
+    }
+    history.forEach(e => {
+      const d = new Date(e.date + 'T00:00:00');
+      const label = d.toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+      const div = document.createElement('div');
+      div.className = 'memory-entry';
+      div.innerHTML = `<strong>${label}</strong><br>
+        Calories: ${e.cal} &nbsp;|&nbsp; Cal from Macros: ${e.macroCal}<br>
+        Fat: ${e.fat}g &nbsp;|&nbsp; Carbs: ${e.carb}g &nbsp;|&nbsp; Protein: ${e.prot}g<br>
+        💧 Water: ${e.water} / ${e.waterGoal} ml`;
+      list.appendChild(div);
+    });
+  }
+
+  // ── Init ───────────────────────────────────────────────────────────────────
+  window.onload = () => {
+    initializeCharts();
+    loadGoals();
+    currentDate = todayStr();
+    updateDateLabel();
+    loadDayData();
+    renderHistory();
+  };
+</script>
 </body>
 </html>
